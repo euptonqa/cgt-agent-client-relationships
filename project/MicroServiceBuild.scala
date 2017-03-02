@@ -1,9 +1,6 @@
 import sbt._
 import play.sbt.PlayImport._
 import play.core.PlayVersion
-import uk.gov.hmrc.SbtAutoBuildPlugin
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin
-import uk.gov.hmrc.versioning.SbtGitVersioning
 
 object MicroServiceBuild extends Build with MicroService {
 
@@ -13,7 +10,7 @@ object MicroServiceBuild extends Build with MicroService {
 
   val compile = Seq(
     ws,
-    "uk.gov.hmrc" %% "microservice-bootstrap" % "5.13.0",
+    "uk.gov.hmrc" %% "microservice-bootstrap" % "5.11.0",
     "uk.gov.hmrc" %% "play-authorisation" % "4.3.0",
     "uk.gov.hmrc" %% "play-health" % "2.1.0",
     "uk.gov.hmrc" %% "play-url-binders" % "2.1.0",

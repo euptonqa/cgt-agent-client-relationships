@@ -1,7 +1,7 @@
-import sbt.Keys._
-import sbt.Tests.{SubProcess, Group}
-import sbt._
 import play.routes.compiler.StaticRoutesGenerator
+import sbt.Keys._
+import sbt.Tests.{Group, SubProcess}
+import sbt._
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 
 
@@ -23,11 +23,22 @@ trait MicroService {
   lazy val plugins : Seq[Plugins] = Seq.empty
   lazy val playSettings : Seq[Setting[_]] = Seq.empty
 
+  lazy val scoverageSettings = {
+    import scoverage.ScoverageKeys
+    Seq(
+      // Semicolon-separated list of regexs matching classes to exclude
+      ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;uk.gov.hmrc.BuildInfo;app.*;prod.*;config.*;com.*",
+      ScoverageKeys.coverageMinimum := 90,
+      ScoverageKeys.coverageFailOnMinimum := false,
+      ScoverageKeys.coverageHighlighting := true
+    )
+  }
 
   lazy val microservice = Project(appName, file("."))
-    .enablePlugins(Seq(play.sbt.PlayScala,SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin) ++ plugins : _*)
-    .settings(playSettings : _*)
+    .enablePlugins(Seq(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin) ++ plugins : _*)
+    .settings(playSettings: _*)
     .settings(scalaSettings: _*)
+    .settings(scoverageSettings: _*)
     .settings(publishingSettings: _*)
     .settings(defaultSettings(): _*)
     .settings(
@@ -44,10 +55,10 @@ trait MicroService {
       addTestReportOption(IntegrationTest, "int-test-reports"),
       testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
       parallelExecution in IntegrationTest := false)
-      .settings(resolvers ++= Seq(
-        Resolver.bintrayRepo("hmrc", "releases"),
-        Resolver.jcenterRepo
-      ))
+    .settings(
+      resolvers += Resolver.bintrayRepo("hmrc", "releases"),
+      resolvers += Resolver.jcenterRepo
+    )
 }
 
 private object TestPhases {

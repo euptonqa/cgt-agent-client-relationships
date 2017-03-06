@@ -6,13 +6,7 @@ object MicroServiceBuild extends Build with MicroService {
 
   val appName = "cgt-agent-client-relationships"
 
-  override lazy val appDependencies: Seq[ModuleID] = AppDependencies()
-
-}
-
-private object AppDependencies {
-  import play.sbt.PlayImport._
-  import play.core.PlayVersion
+  override lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 
   private val microserviceBootstrapVersion = "5.11.0"
   private val playAuthVersion = "4.3.0"
@@ -24,7 +18,6 @@ private object AppDependencies {
   private val hmrcTestVersion = "2.3.0"
   private val scalaTestVersion = "2.2.6"
   private val pegdownVersion = "1.6.0"
-
 
   val compile = Seq(
 
@@ -38,37 +31,12 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "domain" % domainVersion
   )
 
-  trait TestDependencies {
-    lazy val scope: String = "test"
-    lazy val test : Seq[ModuleID] = ???
-  }
-
-  object Test {
-    def apply() = new TestDependencies {
-      override lazy val test = Seq(
-        "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
-        "org.scalatest" %% "scalatest" % scalaTestVersion % scope,
-        "org.pegdown" % "pegdown" % pegdownVersion % scope,
-        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-        "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % scope,
-        "org.mockito" % "mockito-core" % "2.6.2" % "test"
-      )
-    }.test
-  }
-
-  object IntegrationTest {
-    def apply() = new TestDependencies {
-
-      override lazy val scope: String = "it"
-
-      override lazy val test = Seq(
-        "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
-        "org.scalatest" %% "scalatest" % scalaTestVersion % scope,
-        "org.pegdown" % "pegdown" % pegdownVersion % scope,
-        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope
-      )
-    }.test
-  }
-
-  def apply() = compile ++ Test() ++ IntegrationTest()
+  def test(scope: String = "test,it") = Seq(
+    "uk.gov.hmrc" %% "hmrctest" % "2.3.0" % scope,
+    "org.scalatest" %% "scalatest" % "2.2.6" % scope,
+    "org.pegdown" % "pegdown" % "1.6.0" % scope,
+    "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
+    "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % scope,
+    "org.mockito" % "mockito-core" % "2.6.2" % "test"
+  )
 }

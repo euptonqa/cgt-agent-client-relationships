@@ -16,15 +16,16 @@
 
 package controllers
 
+import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.play.microservice.controller.BaseController
 import play.api.mvc._
+
 import scala.concurrent.Future
 
-trait MicroserviceHelloWorld extends BaseController {
+@Singleton
+class MicroserviceHelloWorld @Inject()() extends BaseController {
 
 	def hello() = Action.async { implicit request =>
 		Future.successful(Ok("Hello world"))
 	}
 }
-
-object MicroserviceHelloWorld extends MicroserviceHelloWorld

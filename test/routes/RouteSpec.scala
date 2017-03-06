@@ -21,7 +21,7 @@ import uk.gov.hmrc.play.test.UnitSpec
 class RouteSpec extends UnitSpec {
 
   "The URL for the createRelationship action" should {
-    "be equal to /create-relationship" in {
+    "be equal to /capital-gains-tax/agent/client" in {
       val path = controllers.routes.RelationshipController.createRelationship().url
       path shouldEqual "/capital-gains-tax/agent/client"
     }

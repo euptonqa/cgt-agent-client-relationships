@@ -8,6 +8,22 @@ This microservice provides RESTful endpoints for the creation of an Agent and Cl
  
 There is a frontend microservice [CGT-Agent-Client-Relationships-Frontend](https://github.com/hmrc/cgt-agent-client-relationships-frontend) that provides the views and controllers which interact with this microservice.
 
+### Run the application
+
+To run the application execute
+
+```
+sbt 'run 9773'
+```
+
+### Test the application
+
+To test the application execute
+
+```
+sbt test
+```
+
 ## Requirements
 
 This service is written in [Scala](http://www.scala-lang.org/) and [Play](http://playframework.com/), so needs a [JRE] to run.

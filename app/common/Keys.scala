@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package routes
+package common
 
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+object Keys {
 
-class RouteSpec extends UnitSpec with WithFakeApplication {
-
-  "The URL for the createRelationship action" should {
-    "be equal to /capital-gains-tax/agent/client" in {
-      val path = controllers.routes.RelationshipController.createRelationship().url
-      path shouldEqual "/capital-gains-tax/agent/client"
-    }
+  object EnrolmentKeys {
+    val agentEnrolmentKey: String = "HMRC-AGENT-AGENT"
   }
 }

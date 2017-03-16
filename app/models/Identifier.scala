@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package routes
+package models
 
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import play.api.libs.json.{Json, OFormat}
 
-class RouteSpec extends UnitSpec with WithFakeApplication {
+case class Identifier(key: String, value: String)
 
-  "The URL for the createRelationship action" should {
-    "be equal to /capital-gains-tax/agent/client" in {
-      val path = controllers.routes.RelationshipController.createRelationship().url
-      path shouldEqual "/capital-gains-tax/agent/client"
-    }
-  }
+object Identifier {
+  implicit val formats: OFormat[Identifier] = Json.format[Identifier]
 }
+

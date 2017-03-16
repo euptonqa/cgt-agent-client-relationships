@@ -16,9 +16,10 @@
 
 package routes
 
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import org.scalatestplus.play.OneAppPerSuite
+import uk.gov.hmrc.play.test.UnitSpec
 
-class RouteSpec extends UnitSpec with WithFakeApplication {
+class RouteSpec extends UnitSpec with OneAppPerSuite {
 
   "The URL for the createRelationship action" should {
     "be equal to /capital-gains-tax/agent/client" in {

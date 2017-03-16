@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package routes
+package checks
 
-import org.scalatestplus.play.OneAppPerSuite
-import uk.gov.hmrc.play.test.UnitSpec
+import common.Keys
+import models.Enrolment
 
-class RouteSpec extends UnitSpec with OneAppPerSuite {
+import scala.concurrent.Future
 
-  "The URL for the createRelationship action" should {
-    "be equal to /capital-gains-tax/agent/client" in {
-      val path = controllers.routes.RelationshipController.createRelationship().url
-      path shouldEqual "/capital-gains-tax/agent/client"
-    }
+object EnrolmentCheck {
+  def checkEnrolments(enrolments: Option[Seq[Enrolment]]): Future[Boolean] = enrolments match {
+    case Some(data) => Future.successful(data.exists(_.key == Keys.EnrolmentKeys.agentEnrolmentKey))
+    case None => Future.successful(false)
   }
 }

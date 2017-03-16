@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package routes
+package auth
 
-import org.scalatestplus.play.OneAppPerSuite
-import uk.gov.hmrc.play.test.UnitSpec
+import javax.inject.{Inject, Singleton}
 
-class RouteSpec extends UnitSpec with OneAppPerSuite {
+@Singleton
+class AuthorisedActions @Inject()() {
 
-  "The URL for the createRelationship action" should {
-    "be equal to /capital-gains-tax/agent/client" in {
-      val path = controllers.routes.RelationshipController.createRelationship().url
-      path shouldEqual "/capital-gains-tax/agent/client"
-    }
-  }
 }

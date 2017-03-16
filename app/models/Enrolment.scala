@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package routes
+package models
 
-import org.scalatestplus.play.OneAppPerSuite
-import uk.gov.hmrc.play.test.UnitSpec
+import play.api.libs.json.{Json, OFormat}
 
-class RouteSpec extends UnitSpec with OneAppPerSuite {
+case class Enrolment(key: String, identifiers: Seq[Identifier], state: String)
 
-  "The URL for the createRelationship action" should {
-    "be equal to /capital-gains-tax/agent/client" in {
-      val path = controllers.routes.RelationshipController.createRelationship().url
-      path shouldEqual "/capital-gains-tax/agent/client"
-    }
-  }
+object Enrolment {
+  implicit val formats: OFormat[Enrolment] = Json.format[Enrolment]
 }
+

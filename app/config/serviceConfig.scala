@@ -38,5 +38,5 @@ class ApplicationConfig @Inject()(configuration: Configuration) extends AppConfi
   override lazy val analyticsHost: String = loadConfig(s"google-analytics.host")
 
   override lazy val authBaseUrl: String = baseUrl("auth")
-  override lazy val authAuthorityUrl: String = authBaseUrl + "/auth/authority"
+  override lazy val authAuthorityUrl: String = s"$authBaseUrl/auth/authority"
 }

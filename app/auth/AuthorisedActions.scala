@@ -18,7 +18,22 @@ package auth
 
 import javax.inject.{Inject, Singleton}
 
-@Singleton
-class AuthorisedActions @Inject()() {
+import checks.{AffinityGroupCheck, EnrolmentCheck}
+import play.api.mvc.Result
+import services.AuthorisationService
+import uk.gov.hmrc.play.http.HeaderCarrier
 
+import scala.concurrent.Future
+
+@Singleton
+class AuthorisedActions @Inject()(authorisationService: AuthorisationService) {
+
+  def authorisedAgentAction(action: Boolean => Future[Result])(implicit hc: HeaderCarrier): Future[Result] = {
+    for {
+      authority <- authorisationService.getUserAuthority()
+      affinityGroupCheck <- AffinityGroupCheck.affinityGroupCheckAgent(authority.affinityGroup)
+      enrolmentCheck <- EnrolmentCheck.checkEnrolments(Some(authority.enrolments.toSeq))
+      result <- action(affinityGroupCheck && enrolmentCheck)
+    } yield result
+  }
 }

@@ -26,7 +26,6 @@ import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpResponse}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-
 @Singleton
 class AuthorisationConnector @Inject()(config: AppConfig) {
 

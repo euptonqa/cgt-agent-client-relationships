@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package models
+package services
 
-import play.api.libs.json.{Json, OFormat}
+import javax.inject.{Inject, Singleton}
 
-case class AuthorityModel(affinityGroup: String, enrolments: Set[Enrolment])
+import connectors.AuthorisationConnector
+import models.AuthorityModel
+import uk.gov.hmrc.play.http.HeaderCarrier
 
-object AuthorityModel {
-  implicit val formats: OFormat[AuthorityModel] = Json.format[AuthorityModel]
+import scala.concurrent.Future
+
+@Singleton
+class AuthorisationService @Inject()(connector: AuthorisationConnector) {
+
+  def getUserAuthority()(implicit hc: HeaderCarrier): Future[AuthorityModel] = {
+    connector.getAuthority()
+  }
 }

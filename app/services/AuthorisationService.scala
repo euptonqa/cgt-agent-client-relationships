@@ -14,27 +14,20 @@
  * limitations under the License.
  */
 
-package auth
+package services
 
 import javax.inject.{Inject, Singleton}
 
-import checks.{AffinityGroupCheck, EnrolmentCheck}
-import play.api.mvc.Result
-import services.AuthorisationService
+import connectors.AuthorisationConnector
+import models.AuthorityModel
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class AuthorisedActions @Inject()(authorisationService: AuthorisationService) {
+class AuthorisationService @Inject()(connector: AuthorisationConnector) {
 
-  def authorisedAgentAction(action: Boolean => Future[Result])(implicit hc: HeaderCarrier): Future[Result] = {
-    for {
-      authority <- authorisationService.getUserAuthority()
-      affinityGroupCheck <- AffinityGroupCheck.affinityGroupCheckAgent(authority.affinityGroup)
-      enrolmentCheck <- EnrolmentCheck.checkEnrolments(Some(authority.enrolments.toSeq))
-      result <- action(affinityGroupCheck && enrolmentCheck)
-    } yield result
+  def getUserAuthority()(implicit hc: HeaderCarrier): Future[AuthorityModel] = {
+    connector.getAuthority()
   }
 }

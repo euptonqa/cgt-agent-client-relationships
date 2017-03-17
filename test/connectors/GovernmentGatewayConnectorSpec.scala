@@ -57,7 +57,7 @@ class GovernmentGatewayConnectorSpec extends UnitSpec with MockitoSugar with One
       lazy val connector = createMockedConnector(NO_CONTENT, "")
       lazy val result = connector.createClientRelationship(SubmissionModel(RelationshipModel("arn", "cgtRef"), "name"))
 
-      await(result).isInstanceOf[Unit]
+      await(result) shouldBe NO_CONTENT
     }
 
     "return a failed future when a 500 response is received" in {

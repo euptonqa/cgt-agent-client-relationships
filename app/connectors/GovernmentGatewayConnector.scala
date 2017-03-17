@@ -52,13 +52,14 @@ class GovernmentGatewayConnector @Inject()(config: ApplicationConfig, wSHttp: WS
     )
   }
 
-  def createClientRelationship(submissionModel: SubmissionModel)(implicit hc: HeaderCarrier): Future[Unit] = {
+  def createClientRelationship(submissionModel: SubmissionModel)(implicit hc: HeaderCarrier): Future[Int] = {
     val url: String = s"$serviceUrl/agent/${submissionModel.relationshipModel.arn}/client-list"
 
     wSHttp.POST[JsValue, HttpResponse](url, modelToSubmissionPayload(submissionModel)).map {
       response => response.status match {
         case NO_CONTENT =>
           Logger.info("Agent-client relationship created in Gateway")
+          NO_CONTENT
         case _ =>
           val error = s"Invalid Gateway response code:${response.status} message:${response.body}"
           Logger.warn(error)

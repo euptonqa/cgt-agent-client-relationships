@@ -23,4 +23,16 @@ object Constants {
     val Individual = "Individual"
     val Organisation = "Organisation"
   }
+
+  object AuditConstants {
+      val splunk = "SPLUNK AUDIT:\n"
+
+      val eventTypeGeneric: String = "UnexpectedError"
+      val eventTypeFailure: String = "CGT-ACRSFailure"
+      val eventTypeSuccess: String = "CGT-ACRSSuccess"
+      val eventTypeConflict: String = "CGT-ACRSConflict"
+      val eventTypeBadGateway: String = "BadGateway"
+      val eventTypeNotFound: String = "NotFound"
+      val eventTypeInternalServerError: String = "InternalServerError"
+  }
 }

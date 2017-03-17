@@ -16,6 +16,13 @@
 
 package connectors
 
+import javax.inject.Inject
+
+import audit.Logging
+import config.ApplicationConfig
+
 class DESConnector @Inject()(appConfig: ApplicationConfig, logger: Logging){
 
+  lazy val serviceUrl: String = appConfig.baseUrl("des")
+  lazy val serviceContext: String = appConfig.desContextUrl
 }

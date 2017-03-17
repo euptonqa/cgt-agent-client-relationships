@@ -24,6 +24,7 @@ trait AppConfig {
   val assetsPrefix: String
   val analyticsToken: String
   val analyticsHost: String
+  val desContextUrl: String
 }
 
 @Singleton
@@ -34,4 +35,6 @@ class ApplicationConfig @Inject()(configuration: Configuration) extends AppConfi
   override lazy val assetsPrefix: String = loadConfig(s"assets.url") + loadConfig(s"assets.version")
   override lazy val analyticsToken: String = loadConfig(s"google-analytics.token")
   override lazy val analyticsHost: String = loadConfig(s"google-analytics.host")
+
+  override val desContextUrl: String = loadConfig("microservice.services.des.context")
 }

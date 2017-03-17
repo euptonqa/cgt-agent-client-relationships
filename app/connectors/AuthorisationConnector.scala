@@ -22,6 +22,7 @@ import play.api.http.Status._
 import config.{AppConfig, WSHttp}
 import models.{AuthorityModel, Enrolment}
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpResponse}
+import play.api.Logger
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -38,11 +39,13 @@ class AuthorisationConnector @Inject()(config: AppConfig) {
       response =>
         response.status match {
           case OK =>
+            Logger.info("Received an OK response from auth/authority")
             val affinityGroup = (response.json \ "affinityGroup").as[String]
             val enrolments = (response.json \ "enrolments").as[Set[Enrolment]]
             AuthorityModel(affinityGroup, enrolments)
-
-          case e => throw new Exception(s"The request for the authority returned a $e")
+          case e =>
+            Logger.warn(s"Received an $e response from auth/authority")
+            throw new Exception(s"The request for the authority returned a $e")
         }
     }
   }

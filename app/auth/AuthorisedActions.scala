@@ -24,6 +24,7 @@ import services.AuthorisationService
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class AuthorisedActions @Inject()(authorisationService: AuthorisationService) {

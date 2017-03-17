@@ -34,5 +34,6 @@ object Constants {
       val eventTypeBadGateway: String = "BadGateway"
       val eventTypeNotFound: String = "NotFound"
       val eventTypeInternalServerError: String = "InternalServerError"
+      val transactionDESRelationshipCreation: String = "SuccessfulRelationshipCreation"
   }
 }

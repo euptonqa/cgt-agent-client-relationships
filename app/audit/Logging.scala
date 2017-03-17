@@ -18,7 +18,7 @@ package audit
 
 import javax.inject.Inject
 
-import common.AuditConstants
+import common.Constants.AuditConstants
 
 /*
  * Copyright 2017 HM Revenue & Customs

@@ -21,15 +21,18 @@ import javax.inject.Inject
 import connectors.{DESConnector, GovernmentGatewayConnector, SuccessDesResponse}
 import models.SubmissionModel
 import play.api.http.Status._
+import uk.gov.hmrc.play.http.HeaderCarrier
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-class RelationshipService @Inject()(ggConnector: GovernmentGatewayConnector, desConnector: DESConnector) {
+trait RelationshipResponse
+case object SuccessfulAgentCreation extends RelationshipResponse
+case object FailedAgentCreation extends RelationshipResponse
 
-  trait RelationshipResponse
-  case object SuccessfulAgentCreation extends RelationshipResponse
-  case object FailedAgentCreation extends RelationshipResponse
+class RelationshipService @Inject()(ggConnector: GovernmentGatewayConnector, desConnector: DESConnector)(implicit hc: HeaderCarrier) {
 
-  def createRelationship(submissionModel: SubmissionModel): Unit = {
+  def createRelationship(submissionModel: SubmissionModel): Future[RelationshipResponse] = {
     val relationshipModel = submissionModel.relationshipModel
     for {
       ggResponse <- ggConnector.createClientRelationship(submissionModel)

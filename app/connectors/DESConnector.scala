@@ -28,9 +28,12 @@ import uk.gov.hmrc.play.http.logging.Authorization
 import play.api.http.Status._
 import common.Constants.AuditConstants._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
 sealed trait DesResponse
 
-case class SuccessDesResponse(response: JsValue) extends DesResponse
+case object SuccessDesResponse extends DesResponse
 
 case object NotFoundDesResponse extends DesResponse
 
@@ -41,7 +44,7 @@ case class InvalidDesRequest(message: String) extends DesResponse
 case object DuplicateDesResponse extends DesResponse
 
 @Singleton
-class DESConnector @Inject()(appConfig: ApplicationConfig, logger: Logging){
+class DESConnector @Inject()(appConfig: ApplicationConfig, logger: Logging) extends HttpErrorFunctions{
 
   lazy val serviceUrl: String = appConfig.baseUrl("des")
   lazy val serviceContext: String = appConfig.desContextUrl
@@ -56,24 +59,20 @@ class DESConnector @Inject()(appConfig: ApplicationConfig, logger: Logging){
 
   val http: HttpGet with HttpPost with HttpPut = WSHttp
 
-  def createAgentClientRelationship(relationshipModel: RelationshipModel)(implicit hc: HeaderCarrier): Unit ={
+  def createAgentClientRelationship(relationshipModel: RelationshipModel)(implicit hc: HeaderCarrier): Future[DesResponse] ={
     val arnReference = relationshipModel.arn
     Logger.warn(s"Made a POST request to the stub to create a relationship model with the ARN ${arnReference}" +
       s"and CGT Ref ${relationshipModel.cgtRef}")
-
     val requestUrl: String = s"$serviceUrl$serviceContext/create-relationship/"
-    //TODO: Update the correct DES end point is known
     val response = cPOST(requestUrl, Json.toJson(relationshipModel))
-
     val auditMap: Map[String, String] = Map("ARN"->relationshipModel.arn, "Url"->requestUrl)
-
     response map {
       r =>
         r.status match {
           case OK =>
             Logger.info(s"Successful DES submission for $arnReference")
             logger.audit(transactionDESRelationshipCreation, auditMap, eventTypeSuccess)
-            SuccessDesResponse(r.json)
+            SuccessDesResponse
           case CONFLICT =>
             Logger.warn("Error Conflict: SAP Number already in existence")
             logger.audit(transactionDESRelationshipCreation, conflictAuditMap(auditMap, r), eventTypeConflict)
@@ -81,7 +80,11 @@ class DESConnector @Inject()(appConfig: ApplicationConfig, logger: Logging){
           case ACCEPTED =>
             Logger.info(s"Accepted DES submission for $arnReference")
             logger.audit(transactionDESRelationshipCreation, auditMap, eventTypeSuccess)
-            SuccessDesResponse(r.json)
+            SuccessDesResponse
+          case NO_CONTENT =>
+            Logger.info(s"Accepted DES submission for $arnReference")
+            logger.audit(transactionDESRelationshipCreation, auditMap, eventTypeSuccess)
+            SuccessDesResponse
           case BAD_REQUEST =>
             val message = (r.json \ "reason").as[String]
             Logger.warn(s"Error with the request $message")
@@ -125,4 +128,19 @@ class DESConnector @Inject()(appConfig: ApplicationConfig, logger: Logging){
 
   private def failureAuditMap(auditMap: Map[String, String], response: HttpResponse) =
     auditMap ++ Map("Failure reason" -> response.body, "Status" -> response.status.toString)
+
+  implicit val httpRds = new HttpReads[HttpResponse] {
+    def read(http: String, url: String, res: HttpResponse): HttpResponse = customDESRead(http, url, res)
+  }
+
+  private[connectors] def customDESRead(http: String, url: String, response: HttpResponse) = {
+    response.status match {
+      case BAD_REQUEST => response
+      case NOT_FOUND => throw new NotFoundException("DES returned a Not Found status")
+      case CONFLICT => response
+      case INTERNAL_SERVER_ERROR => throw new InternalServerException("DES returned an internal server error")
+      case BAD_GATEWAY => throw new BadGatewayException("DES returned an upstream error")
+      case _ => handleResponse(http, url)(response)
+    }
+  }
 }

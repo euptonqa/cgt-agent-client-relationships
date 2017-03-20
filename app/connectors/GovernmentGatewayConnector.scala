@@ -18,21 +18,23 @@ package connectors
 
 import javax.inject.{Inject, Singleton}
 
-import config.ApplicationConfig
+import config.{ApplicationConfig, WSHttp}
 import models.SubmissionModel
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.http._
 import uk.gov.hmrc.play.http.ws.WSHttp
 import play.api.http.Status._
+import play.mvc.Http
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class GovernmentGatewayConnector @Inject()(config: ApplicationConfig, wSHttp: WSHttp) {
+class GovernmentGatewayConnector @Inject()(config: ApplicationConfig) {
 
   val serviceUrl: String = config.governmentGatewayServiceUrl
+  val http: HttpGet with HttpPost with HttpPut = WSHttp
 
   private def modelToSubmissionPayload(submissionModel: SubmissionModel): JsValue = {
     Json.obj(
@@ -55,7 +57,7 @@ class GovernmentGatewayConnector @Inject()(config: ApplicationConfig, wSHttp: WS
   def createClientRelationship(submissionModel: SubmissionModel)(implicit hc: HeaderCarrier): Future[Int] = {
     val url: String = s"$serviceUrl/agent/${submissionModel.relationshipModel.arn}/client-list"
 
-    wSHttp.POST[JsValue, HttpResponse](url, modelToSubmissionPayload(submissionModel)).map {
+    http.POST[JsValue, HttpResponse](url, modelToSubmissionPayload(submissionModel)).map {
       response => response.status match {
         case NO_CONTENT =>
           Logger.info("Agent-client relationship created in Gateway")

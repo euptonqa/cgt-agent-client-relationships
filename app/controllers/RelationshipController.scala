@@ -18,10 +18,34 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
+import models.SubmissionModel
+import play.api.mvc.{Action, Result}
+import services.{RelationshipResponse, RelationshipService, SuccessfulAgentCreation}
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
-@Singleton
-class RelationshipController @Inject()() extends BaseController {
+import scala.concurrent.ExecutionContext.Implicits.global
 
-  val createRelationship = TODO
+@Singleton
+class RelationshipController @Inject()(relationshipService: RelationshipService) extends BaseController {
+
+  val createRelationship = Action.async {
+    implicit request =>
+        val model = request.body.asJson.get.as[SubmissionModel]
+        val result = relationshipService.createRelationship(model).map { response =>
+          mapAgentResponse(response)
+        }
+
+      result.recover{
+        case _ => InternalServerError
+      }
+  }
+
+  def mapAgentResponse(relationshipResponse: RelationshipResponse): Result = {
+    if (relationshipResponse == SuccessfulAgentCreation) {
+      NoContent
+    }
+    else {
+      InternalServerError
+    }
+  }
 }

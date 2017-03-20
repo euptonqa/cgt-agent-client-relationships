@@ -48,7 +48,9 @@ class GovernmentGatewayConnectorSpec extends UnitSpec with MockitoSugar with One
       ArgumentMatchers.any(), ArgumentMatchers.any()))
       .thenReturn(Future.successful(mockHttpResponse))
 
-    new GovernmentGatewayConnector(config, mockHttp)
+    new GovernmentGatewayConnector(config) {
+      override val http = mockHttp
+    }
   }
 
   "Calling .createClientRelationship" should {

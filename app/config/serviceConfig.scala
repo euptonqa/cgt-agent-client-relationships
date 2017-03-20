@@ -25,6 +25,9 @@ trait AppConfig {
   val analyticsToken: String
   val analyticsHost: String
   val desContextUrl: String
+  val authBaseUrl: String
+  val authAuthorityUrl: String
+  val governmentGatewayServiceUrl: String
 }
 
 @Singleton
@@ -37,4 +40,7 @@ class ApplicationConfig @Inject()(configuration: Configuration) extends AppConfi
   override lazy val analyticsHost: String = loadConfig(s"google-analytics.host")
 
   override val desContextUrl: String = loadConfig("microservice.services.des.context")
+  override lazy val authBaseUrl: String = baseUrl("auth")
+  override lazy val authAuthorityUrl: String = s"$authBaseUrl/auth/authority"
+  override lazy val governmentGatewayServiceUrl: String = baseUrl("government-gateway")
 }

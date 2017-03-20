@@ -26,6 +26,7 @@ trait AppConfig {
   val analyticsHost: String
   val authBaseUrl: String
   val authAuthorityUrl: String
+  val governmentGatewayServiceUrl: String
 }
 
 @Singleton
@@ -39,4 +40,5 @@ class ApplicationConfig @Inject()(configuration: Configuration) extends AppConfi
 
   override lazy val authBaseUrl: String = baseUrl("auth")
   override lazy val authAuthorityUrl: String = s"$authBaseUrl/auth/authority"
+  override lazy val governmentGatewayServiceUrl: String = baseUrl("government-gateway")
 }

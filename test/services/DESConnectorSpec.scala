@@ -1,3 +1,5 @@
+package services
+
 /*
  * Copyright 2017 HM Revenue & Customs
  *
@@ -31,8 +33,8 @@ import uk.gov.hmrc.domain.Generator
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.http.logging.SessionId
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse, NotFoundException}
 import uk.gov.hmrc.play.http.ws.{WSGet, WSPost, WSPut}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse, NotFoundException}
 import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.{ExecutionContext, Future}

@@ -65,7 +65,7 @@ class DESConnector @Inject()(appConfig: ApplicationConfig, logger: Logging) exte
       s"and CGT Ref ${relationshipModel.cgtRef}")
     val requestUrl: String = s"$serviceUrl$serviceContext/create-relationship/"
     val response = cPOST(requestUrl, Json.toJson(relationshipModel))
-    val auditMap: Map[String, String] = Map("ARN"->relationshipModel.arn, "Url"->requestUrl)
+    val auditMap: Map[String, String] = Map("ARN"->arnReference, "Url"->requestUrl)
     response map {
       r =>
         r.status match {
@@ -87,7 +87,7 @@ class DESConnector @Inject()(appConfig: ApplicationConfig, logger: Logging) exte
             SuccessDesResponse
           case BAD_REQUEST =>
             val message = (r.json \ "reason").as[String]
-            Logger.warn(s"Error with the request $message")
+            Logger.warn(s"Error with the request ${r.body}")
             logger.audit(transactionDESRelationshipCreation, failureAuditMap(auditMap, r), eventTypeFailure)
             InvalidDesRequest(message)
         }

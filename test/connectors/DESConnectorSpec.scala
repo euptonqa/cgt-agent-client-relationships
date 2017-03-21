@@ -137,11 +137,11 @@ class DESConnectorSpec extends UnitSpec with OneServerPerSuite with MockitoSugar
     "return an invalid request with a BAD_REQUEST with the appropriate error message" in {
       when(mockWSHttp.POST[JsValue, HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())
         (ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-        .thenReturn(Future.successful(HttpResponse(BAD_REQUEST, responseJson = Some(Json.obj("reason" -> "not found")))))
+        .thenReturn(Future.successful(HttpResponse(BAD_REQUEST)))
 
       val result = await(TestDESConnector.createAgentClientRelationship(validRelationshipModel))
 
-      result shouldBe InvalidDesRequest("not found")
+      result shouldBe InvalidDesRequest
     }
 
     "return a DesErrorResponse when a NOT_FOUND is sent" in {

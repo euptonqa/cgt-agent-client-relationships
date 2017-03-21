@@ -22,7 +22,7 @@ import audit.Logging
 import config.{ApplicationConfig, WSHttp}
 import models.RelationshipModel
 import play.api.Logger
-import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.play.http._
 import uk.gov.hmrc.play.http.logging.Authorization
 import play.api.http.Status._
@@ -39,7 +39,7 @@ case object NotFoundDesResponse extends DesResponse
 
 case object DesErrorResponse extends DesResponse
 
-case class InvalidDesRequest(message: String) extends DesResponse
+case object InvalidDesRequest extends DesResponse
 
 case object DuplicateDesResponse extends DesResponse
 
@@ -86,10 +86,9 @@ class DESConnector @Inject()(appConfig: ApplicationConfig, logger: Logging) exte
             logger.audit(transactionDESRelationshipCreation, auditMap, eventTypeSuccess)
             SuccessDesResponse
           case BAD_REQUEST =>
-            val message = (r.json \ "reason").as[String]
             Logger.warn(s"Error with the request ${r.body}")
             logger.audit(transactionDESRelationshipCreation, failureAuditMap(auditMap, r), eventTypeFailure)
-            InvalidDesRequest(message)
+            InvalidDesRequest
         }
     } recover {
       case _: NotFoundException =>

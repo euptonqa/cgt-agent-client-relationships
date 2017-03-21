@@ -31,11 +31,11 @@ trait RelationshipResponse
 case object SuccessfulAgentCreation extends RelationshipResponse
 case object FailedAgentCreation extends RelationshipResponse
 @Singleton
-class RelationshipService @Inject()(ggConnector: GovernmentGatewayConnector, desConnector: DESConnector)(implicit hc: HeaderCarrier) {
+class RelationshipService @Inject()(ggConnector: GovernmentGatewayConnector, desConnector: DESConnector){
 
   val http: HttpGet = WSHttp
   
-  def createRelationship(submissionModel: SubmissionModel): Future[RelationshipResponse] = {
+  def createRelationship(submissionModel: SubmissionModel)(implicit hc: HeaderCarrier): Future[RelationshipResponse] = {
     val relationshipModel = submissionModel.relationshipModel
     for {
       ggResponse <- ggConnector.createClientRelationship(submissionModel)

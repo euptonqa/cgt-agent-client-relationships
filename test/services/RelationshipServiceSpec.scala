@@ -44,7 +44,9 @@ class RelationshipServiceSpec extends UnitSpec with OneAppPerSuite with MockitoS
   implicit val ec = mock[ExecutionContext]
   implicit val hc = new HeaderCarrier(sessionId = Some(SessionId(s"session-${UUID.randomUUID}")))
 
-  object GGConnector extends GovernmentGatewayConnector(mockAppConfig, mockHttpGG)
+  object GGConnector extends GovernmentGatewayConnector(mockAppConfig) {
+    override val http = mockHttpGG
+  }
 
   object TestDESConnector extends DESConnector(mockAppConfig, mockLoggingUtils) {
     override lazy val serviceUrl = "test"
@@ -55,7 +57,7 @@ class RelationshipServiceSpec extends UnitSpec with OneAppPerSuite with MockitoS
     override val urlHeaderAuthorization = "??? same as above"
   }
 
-  lazy val relationshipService = new RelationshipService(GGConnector, TestDESConnector)(hc)
+  lazy val relationshipService = new RelationshipService(GGConnector, TestDESConnector)
 
   before {
     reset(mockHttpDES)

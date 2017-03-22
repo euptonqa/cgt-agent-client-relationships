@@ -16,12 +16,13 @@
 
 package services
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+import config.WSHttp
 import connectors.{DESConnector, GovernmentGatewayConnector, SuccessDesResponse}
 import models.SubmissionModel
 import play.api.http.Status._
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -29,10 +30,12 @@ import scala.concurrent.Future
 trait RelationshipResponse
 case object SuccessfulAgentCreation extends RelationshipResponse
 case object FailedAgentCreation extends RelationshipResponse
+@Singleton
+class RelationshipService @Inject()(ggConnector: GovernmentGatewayConnector, desConnector: DESConnector){
 
-class RelationshipService @Inject()(ggConnector: GovernmentGatewayConnector, desConnector: DESConnector)(implicit hc: HeaderCarrier) {
-
-  def createRelationship(submissionModel: SubmissionModel): Future[RelationshipResponse] = {
+  val http: HttpGet = WSHttp
+  
+  def createRelationship(submissionModel: SubmissionModel)(implicit hc: HeaderCarrier): Future[RelationshipResponse] = {
     val relationshipModel = submissionModel.relationshipModel
     for {
       ggResponse <- ggConnector.createClientRelationship(submissionModel)

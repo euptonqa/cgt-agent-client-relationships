@@ -23,9 +23,7 @@ import models.SubmissionModel
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.play.http._
-import uk.gov.hmrc.play.http.ws.WSHttp
 import play.api.http.Status._
-import play.mvc.Http
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global

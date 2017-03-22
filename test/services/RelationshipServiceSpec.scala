@@ -34,7 +34,6 @@ import uk.gov.hmrc.play.http.ws.WSHttp
 import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Random
 
 class RelationshipServiceSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with BeforeAndAfter {
 

@@ -19,8 +19,8 @@ package services
 import java.util.UUID
 
 import audit.Logging
-import config.{ApplicationConfig, WSHttp}
-import connectors.{DESConnector, GovernmentGatewayConnector, SuccessDesResponse}
+import config.ApplicationConfig
+import connectors.{DESConnector, GovernmentGatewayConnector}
 import models.{RelationshipModel, SubmissionModel}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
@@ -28,10 +28,9 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.JsValue
-import uk.gov.hmrc.domain.Generator
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.http.logging.SessionId
-import uk.gov.hmrc.play.http.ws.{WSGet, WSHttp, WSPost, WSPut}
+import uk.gov.hmrc.play.http.ws.WSHttp
 import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.{ExecutionContext, Future}

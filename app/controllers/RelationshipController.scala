@@ -18,34 +18,50 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
-import models.SubmissionModel
-import play.api.mvc.{Action, Result}
+import auth.AuthorisedActions
+import models.{ExceptionResponse, SubmissionModel}
+import play.api.Logger
+import play.api.libs.json.Json
+import play.api.mvc.{Action, AnyContent, Result}
 import services.{RelationshipResponse, RelationshipService, SuccessfulAgentCreation}
 import uk.gov.hmrc.play.microservice.controller.BaseController
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.util.{Failure, Success, Try}
 
 @Singleton
-class RelationshipController @Inject()(relationshipService: RelationshipService) extends BaseController {
+class RelationshipController @Inject()(actions: AuthorisedActions,
+                                       relationshipService: RelationshipService) extends BaseController {
 
-  val createRelationship = Action.async {
+  private val unauthorisedAction: Future[Result] = Future.successful(Unauthorized(Json.toJson(ExceptionResponse(UNAUTHORIZED, "Unauthorised"))))
+  private val badRequest: Future[Result] = Future.successful(BadRequest(Json.toJson(ExceptionResponse(BAD_REQUEST, "Bad Request"))))
+
+  val createRelationship: Action[AnyContent] = Action.async {
     implicit request =>
-        val model = request.body.asJson.get.as[SubmissionModel]
-        val result = relationshipService.createRelationship(model).map { response =>
-          mapAgentResponse(response)
-        }
 
-      result.recover{
-        case _ => InternalServerError
+      Try(request.body.asJson.get.as[SubmissionModel]) match {
+        case Success(model) =>
+
+          def mapAgentResponse(relationshipResponse: RelationshipResponse): Result = {
+            if (relationshipResponse == SuccessfulAgentCreation) {
+              Logger.info("Succeeded in making relationship")
+              NoContent
+            }
+            else {
+              Logger.warn("~~~~~~~~~~~~~~~~~~~~~~~~~ Failed to create relationship ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+              InternalServerError
+            }
+          }
+
+          actions.authorisedAgentAction {
+            case true => relationshipService.createRelationship(model).map { response =>
+              mapAgentResponse(response)
+            }
+            case false => unauthorisedAction
+          }
+        case Failure(_) => badRequest
       }
-  }
 
-  def mapAgentResponse(relationshipResponse: RelationshipResponse): Result = {
-    if (relationshipResponse == SuccessfulAgentCreation) {
-      NoContent
-    }
-    else {
-      InternalServerError
-    }
   }
 }

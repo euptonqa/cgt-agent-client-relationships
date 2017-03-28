@@ -17,7 +17,7 @@
 package connectors
 
 import config.AppConfig
-import models.{AuthorityModel, Enrolment, Identifier}
+import models.{AuthAuthorityModel, AuthorityModel, Enrolment, Identifier}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -49,7 +49,7 @@ class AuthorisationConnectorSpec extends UnitSpec with MockitoSugar with OneAppP
        |"new-session":"/auth/oid/57e915480f00000f006d915b/session","ids":"/auth/oid/57e915480f00000f006d915b/ids",
        |"credentials":{"gatewayId":"000000000000000"},"accounts":{"paye":{"link":"test","nino":"NININININININO"}},"lastUpdated":"2016-09-26T12:32:08.734Z",
        |"loggedInAt":"2016-09-26T12:32:08.734Z","levelOfAssurance":"1",
-       |"enrolments":[{"key":"HMRC_AGENT_AGENT_KEY","identifiers":[{"key":"Identifier","value":"Value"}],"state":"State"}],
+       |"enrolments":"enrolment-uri",
        |"affinityGroup":"Agent",
        |"correlationId":"0000000000000000000000000000000000000000000000000000000000000000","credId":"000000000000000"}""".stripMargin
   )
@@ -64,7 +64,7 @@ class AuthorisationConnectorSpec extends UnitSpec with MockitoSugar with OneAppP
       lazy val result = await(target.getAuthority())
 
       "return an AuthorityModel" in {
-        result shouldBe a[AuthorityModel]
+        result shouldBe a[AuthAuthorityModel]
       }
 
       "return an AffinityGroup of Agent" in {
@@ -72,12 +72,13 @@ class AuthorisationConnectorSpec extends UnitSpec with MockitoSugar with OneAppP
       }
 
       "return an set of enrolments" in {
-        result.enrolments shouldBe a[Set[Enrolment]]
+        result.enrolmentsUrl shouldBe "enrolment-uri"
       }
 
-      "return a set of enrolments that contains the key HMRC_AGENT_AGENT_KEY" in {
-        result.enrolments.contains(Enrolment("HMRC_AGENT_AGENT_KEY", Seq(Identifier("Identifier", "Value")), "State")) shouldBe true
-      }
+//  This section is commented out as I will need it when I create the tests for the new method.
+//      "return a set of enrolments that contains the key HMRC_AGENT_AGENT_KEY" in {
+//        result.enrolments.contains(Enrolment("HMRC_AGENT_AGENT_KEY", Seq(Identifier("Identifier", "Value")), "State")) shouldBe true
+//      }
     }
 
     "the Connection responds with a not an OK status" in {

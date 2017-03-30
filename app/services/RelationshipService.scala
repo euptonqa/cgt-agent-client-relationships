@@ -26,6 +26,7 @@ import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.Success
 
 trait RelationshipResponse
 case object SuccessfulAgentCreation extends RelationshipResponse
@@ -43,6 +44,16 @@ class RelationshipService @Inject()(ggConnector: GovernmentGatewayConnector, des
     } yield (ggResponse, desResponse) match {
       case (NO_CONTENT, SuccessDesResponse) => SuccessfulAgentCreation
       case (_, _) => FailedAgentCreation
+    }
+  }
+
+  def createGgRelationship(submissionModel: SubmissionModel)(implicit hc: HeaderCarrier): Future[RelationshipResponse] = {
+    ggConnector.createClientRelationship(submissionModel) map {
+      result =>
+        if (result == NO_CONTENT)
+          SuccessfulAgentCreation
+        else
+          FailedAgentCreation
     }
   }
 

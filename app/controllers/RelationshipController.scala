@@ -18,7 +18,7 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
-import models.SubmissionModel
+import models.{RelationshipModel, SubmissionModel}
 import play.api.mvc.{Action, Result}
 import services.{RelationshipResponse, RelationshipService, SuccessfulAgentCreation}
 import uk.gov.hmrc.play.microservice.controller.BaseController
@@ -34,6 +34,30 @@ class RelationshipController @Inject()(relationshipService: RelationshipService)
         val result = relationshipService.createRelationship(model).map { response =>
           mapAgentResponse(response)
         }
+
+      result.recover{
+        case _ => InternalServerError
+      }
+  }
+
+  val createDesRelationship = Action.async {
+    implicit request =>
+      val model = request.body.asJson.get.as[RelationshipModel]
+      val result = relationshipService.createDesRelationship(model).map { response =>
+        mapAgentResponse(response)
+      }
+
+      result.recover{
+        case _ => InternalServerError
+      }
+  }
+
+  val createGgRelationship = Action.async {
+    implicit request =>
+      val model = request.body.asJson.get.as[SubmissionModel]
+      val result = relationshipService.createGgRelationship(model).map { response =>
+        mapAgentResponse(response)
+      }
 
       result.recover{
         case _ => InternalServerError

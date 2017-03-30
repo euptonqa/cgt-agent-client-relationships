@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 
 import config.WSHttp
 import connectors.{DESConnector, GovernmentGatewayConnector, SuccessDesResponse}
-import models.SubmissionModel
+import models.{RelationshipModel, SubmissionModel}
 import play.api.http.Status._
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
 
@@ -57,4 +57,13 @@ class RelationshipService @Inject()(ggConnector: GovernmentGatewayConnector, des
     }
   }
 
+  def createDesRelationship(relationshipModel: RelationshipModel)(implicit hc: HeaderCarrier): Future[RelationshipResponse] = {
+    desConnector.createAgentClientRelationship(relationshipModel) map {
+      result =>
+        if (result == SuccessDesResponse)
+          SuccessfulAgentCreation
+        else
+          FailedAgentCreation
+    }
+  }
 }

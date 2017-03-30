@@ -124,5 +124,61 @@ class RelationshipServiceSpec extends UnitSpec with OneAppPerSuite with MockitoS
         exception.getMessage shouldBe "Invalid Gateway response code:500 message:null"
       }
     }
+
+    "Calling .createGgRelationship" when {
+      "a 204 is obtained as a response from the GGConnector should result in a SuccessfulAgentCreation" in {
+        val submissionModel = SubmissionModel(mock[RelationshipModel], "")
+
+        when(mockHttpGG.POST[JsValue, HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(),
+          ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(HttpResponse(responseStatus = 204)))
+
+        val result = await(relationshipService.createGgRelationship(submissionModel))
+
+        result shouldBe SuccessfulAgentCreation
+      }
+
+      "Any other response is obtained as a response from the GGConnector should result in an exception being thrown" in {
+        val submissionModel = SubmissionModel(mock[RelationshipModel], "")
+
+        when(mockHttpGG.POST[JsValue, HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(),
+          ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(HttpResponse(responseStatus = 500)))
+
+        val result = relationshipService.createGgRelationship(submissionModel)
+
+        lazy val exception = intercept[Exception] {
+          await(result)
+        }
+
+        exception.getMessage shouldBe "Invalid Gateway response code:500 message:null"
+      }
+    }
+
+    "Calling .createDesRelationship" when {
+      "a SuccessfulDESResponse is obtained as a response from the DESConnector should result in a SuccessfulAgentCreation" in {
+        val relationshipModel = mock[RelationshipModel]
+
+        when(mockHttpDES.POST[JsValue, HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(),
+          ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(HttpResponse(responseStatus = 204)))
+
+        val result = await(relationshipService.createDesRelationship(relationshipModel))
+
+        result shouldBe SuccessfulAgentCreation
+      }
+
+      "a FailedDESResponse is obtained as a response from the DESConnector should result in a FailedAgentCreation" in {
+        val relationshipModel = mock[RelationshipModel]
+
+        when(mockHttpDES.POST[JsValue, HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(),
+          ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(HttpResponse(responseStatus = 500)))
+
+        val result = await(relationshipService.createDesRelationship(relationshipModel))
+
+        result shouldBe FailedAgentCreation
+      }
+    }
   }
 }

@@ -20,13 +20,12 @@ import javax.inject.{Inject, Singleton}
 
 import config.WSHttp
 import connectors.{DESConnector, GovernmentGatewayConnector, SuccessDesResponse}
-import models.{RelationshipModel, SubmissionModel}
+import models.SubmissionModel
 import play.api.http.Status._
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.Success
 
 trait RelationshipResponse
 case object SuccessfulAgentCreation extends RelationshipResponse

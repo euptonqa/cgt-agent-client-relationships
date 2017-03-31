@@ -40,7 +40,7 @@ class RelationshipController @Inject()(relationshipService: RelationshipService)
       }
   }
 
-  def mapAgentResponse(relationshipResponse: RelationshipResponse): Result = {
+  private def mapAgentResponse(relationshipResponse: RelationshipResponse): Result = {
     if (relationshipResponse == SuccessfulAgentCreation) {
       NoContent
     }

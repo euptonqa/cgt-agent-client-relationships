@@ -67,37 +67,7 @@ class RelationshipControllerSpec extends UnitSpec with MockitoSugar with OneAppP
 
   lazy val controller = new RelationshipController(relationshipService)
 
-  "Calling the .createDesResponse action" when {
-    val relationshipModel = mock[RelationshipModel]
-    val request = FakeRequest().withJsonBody(Json.toJson(relationshipModel))
-
-    "the service returns a SuccessfulAgentCreationResponse" should {
-      "return a status of 204" in {
-
-        when(mockHttpDES.POST[JsValue, HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(),
-          ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(HttpResponse(responseStatus = 204)))
-
-        val result = await(controller.createDesRelationship()(request))
-
-        status(result) shouldBe 204
-      }
-    }
-
-    "the service returns a FailedAgentCreationResponse" should {
-      "return a status of 500" in {
-        when(mockHttpDES.POST[JsValue, HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(),
-          ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(HttpResponse(responseStatus = 500)))
-
-        val result = await(controller.createDesRelationship()(request))
-
-        status(result) shouldBe 500
-      }
-    }
-  }
-
-  "Calling .createGgResponse action" when {
+  "Calling .createRelationship action" when {
     val submissionModel = SubmissionModel(mock[RelationshipModel], "")
     val request = FakeRequest().withJsonBody(Json.toJson(submissionModel))
 
@@ -107,7 +77,11 @@ class RelationshipControllerSpec extends UnitSpec with MockitoSugar with OneAppP
           ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(HttpResponse(responseStatus = 204)))
 
-        val result = await(controller.createGgRelationship(request))
+        when(mockHttpDES.POST[JsValue, HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(),
+          ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(HttpResponse(responseStatus = 204)))
+
+        lazy val result = await(controller.createRelationship(request))
 
         status(result) shouldBe 204
       }
@@ -119,7 +93,11 @@ class RelationshipControllerSpec extends UnitSpec with MockitoSugar with OneAppP
           ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
           .thenReturn(Future.successful(HttpResponse(responseStatus = 500)))
 
-        val result = await(controller.createGgRelationship(request))
+        when(mockHttpDES.POST[JsValue, HttpResponse](ArgumentMatchers.any(), ArgumentMatchers.any(),
+          ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(HttpResponse(responseStatus = 500)))
+
+        lazy val result = await(controller.createRelationship(request))
 
         status(result) shouldBe 500
       }

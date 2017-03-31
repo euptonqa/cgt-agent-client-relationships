@@ -40,30 +40,6 @@ class RelationshipController @Inject()(relationshipService: RelationshipService)
       }
   }
 
-  val createDesRelationship = Action.async {
-    implicit request =>
-      val model = request.body.asJson.get.as[RelationshipModel]
-      val result = relationshipService.createDesRelationship(model).map { response =>
-        mapAgentResponse(response)
-      }
-
-      result.recover{
-        case _ => InternalServerError
-      }
-  }
-
-  val createGgRelationship = Action.async {
-    implicit request =>
-      val model = request.body.asJson.get.as[SubmissionModel]
-      val result = relationshipService.createGgRelationship(model).map { response =>
-        mapAgentResponse(response)
-      }
-
-      result.recover{
-        case _ => InternalServerError
-      }
-  }
-
   def mapAgentResponse(relationshipResponse: RelationshipResponse): Result = {
     if (relationshipResponse == SuccessfulAgentCreation) {
       NoContent

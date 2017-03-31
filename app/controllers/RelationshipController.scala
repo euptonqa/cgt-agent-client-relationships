@@ -18,7 +18,7 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
-import models.{RelationshipModel, SubmissionModel}
+import models.SubmissionModel
 import play.api.mvc.{Action, Result}
 import services.{RelationshipResponse, RelationshipService, SuccessfulAgentCreation}
 import uk.gov.hmrc.play.microservice.controller.BaseController

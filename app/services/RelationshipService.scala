@@ -46,24 +46,4 @@ class RelationshipService @Inject()(ggConnector: GovernmentGatewayConnector, des
       case (_, _) => FailedAgentCreation
     }
   }
-
-  def createGgRelationship(submissionModel: SubmissionModel)(implicit hc: HeaderCarrier): Future[RelationshipResponse] = {
-    ggConnector.createClientRelationship(submissionModel) map {
-      result =>
-        if (result == NO_CONTENT)
-          SuccessfulAgentCreation
-        else
-          FailedAgentCreation
-    }
-  }
-
-  def createDesRelationship(relationshipModel: RelationshipModel)(implicit hc: HeaderCarrier): Future[RelationshipResponse] = {
-    desConnector.createAgentClientRelationship(relationshipModel) map {
-      result =>
-        if (result == SuccessDesResponse)
-          SuccessfulAgentCreation
-        else
-          FailedAgentCreation
-    }
-  }
 }

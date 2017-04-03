@@ -49,12 +49,7 @@ class RelationshipServiceSpec extends UnitSpec with OneAppPerSuite with MockitoS
   }
 
   object TestDESConnector extends DESConnector(mockAppConfig, mockLoggingUtils) {
-    override lazy val serviceUrl = "test"
-    override val environment = "test"
-    override val token = "test"
     override val http: WSHttp = mockHttpDES
-    override val urlHeaderEnvironment = "??? see srcs, found in config"
-    override val urlHeaderAuthorization = "??? same as above"
   }
 
   lazy val relationshipService = new RelationshipService(GGConnector, TestDESConnector)

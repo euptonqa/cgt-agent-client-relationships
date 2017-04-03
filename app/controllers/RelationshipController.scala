@@ -60,13 +60,4 @@ class RelationshipController @Inject()(actions: AuthorisedActions,
         case Failure(_) => badRequest
       }
   }
-
-  private def mapAgentResponse(relationshipResponse: RelationshipResponse): Result = {
-    if (relationshipResponse == SuccessfulAgentCreation) {
-      NoContent
-    }
-    else {
-      InternalServerError
-    }
-  }
 }

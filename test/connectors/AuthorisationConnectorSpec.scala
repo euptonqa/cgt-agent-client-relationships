@@ -74,11 +74,6 @@ class AuthorisationConnectorSpec extends UnitSpec with MockitoSugar with OneAppP
       "return an set of enrolments" in {
         result.enrolmentsUrl shouldBe "enrolment-uri"
       }
-
-//  This section is commented out as I will need it when I create the tests for the new method.
-//      "return a set of enrolments that contains the key HMRC_AGENT_AGENT_KEY" in {
-//        result.enrolments.contains(Enrolment("HMRC_AGENT_AGENT_KEY", Seq(Identifier("Identifier", "Value")), "State")) shouldBe true
-//      }
     }
 
     "the Connection responds with a not an OK status" in {

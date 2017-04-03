@@ -48,14 +48,8 @@ class DESConnector @Inject()(appConfig: ApplicationConfig, logger: Logging) exte
 
   lazy val serviceUrl: String = appConfig.baseUrl("des")
   lazy val serviceContext: String = appConfig.desContextUrl
-
-  val environment = "test"
-  val token = "des"
-
-  val urlHeaderEnvironment = "???"
-  val urlHeaderAuthorization = "???"
-
-  //TODO: Need to update when known environments and tokens...
+  lazy val environment = appConfig.desEnvironment
+  lazy val token = appConfig.desToken
 
   val http: HttpGet with HttpPost with HttpPut = WSHttp
 
@@ -117,9 +111,7 @@ class DESConnector @Inject()(appConfig: ApplicationConfig, logger: Logging) exte
   }
 
   private def createHeaderCarrier(headerCarrier: HeaderCarrier): HeaderCarrier = {
-    headerCarrier.
-      withExtraHeaders("Environment" -> urlHeaderEnvironment).
-      copy(authorization = Some(Authorization(urlHeaderAuthorization)))
+    headerCarrier.copy(authorization = Some(Authorization(s"Bearer $token"))).withExtraHeaders("Environment" -> environment)
   }
 
   private def conflictAuditMap(auditMap: Map[String, String], response: HttpResponse) =

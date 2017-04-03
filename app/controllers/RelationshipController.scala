@@ -20,7 +20,6 @@ import javax.inject.{Inject, Singleton}
 
 import auth.AuthorisedActions
 import models.{ExceptionResponse, SubmissionModel}
-import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, Result}
 import services.{RelationshipResponse, RelationshipService, SuccessfulAgentCreation}
@@ -45,11 +44,9 @@ class RelationshipController @Inject()(actions: AuthorisedActions,
 
           def mapAgentResponse(relationshipResponse: RelationshipResponse): Result = {
             if (relationshipResponse == SuccessfulAgentCreation) {
-              Logger.info("Succeeded in making relationship")
               NoContent
             }
             else {
-              Logger.warn("~~~~~~~~~~~~~~~~~~~~~~~~~ Failed to create relationship ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
               InternalServerError
             }
           }
@@ -62,6 +59,14 @@ class RelationshipController @Inject()(actions: AuthorisedActions,
           }
         case Failure(_) => badRequest
       }
+  }
 
+  private def mapAgentResponse(relationshipResponse: RelationshipResponse): Result = {
+    if (relationshipResponse == SuccessfulAgentCreation) {
+      NoContent
+    }
+    else {
+      InternalServerError
+    }
   }
 }

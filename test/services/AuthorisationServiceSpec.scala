@@ -19,7 +19,7 @@ package services
 import java.util.UUID
 
 import connectors.AuthorisationConnector
-import models.{AuthorityModel, Enrolment, Identifier}
+import models.{AuthAuthorityModel, AuthorityModel, Enrolment, Identifier}
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
@@ -34,28 +34,42 @@ class AuthorisationServiceSpec extends UnitSpec with OneAppPerSuite with Mockito
 
   implicit val hc = new HeaderCarrier(sessionId = Some(SessionId(s"session-${UUID.randomUUID}")))
 
-  def setupService(authority: Future[AuthorityModel]): AuthorisationService = {
+  def setupService(authAuthority: Future[AuthAuthorityModel], enrolments: Future[Set[Enrolment]]): AuthorisationService = {
 
     val mockConnector = mock[AuthorisationConnector]
 
     when(mockConnector.getAuthority()(ArgumentMatchers.any()))
-      .thenReturn(Future.successful(authority))
+      .thenReturn(authAuthority)
+
+    when(mockConnector.getEnrolmentsResponse(ArgumentMatchers.any())(ArgumentMatchers.any()))
+      .thenReturn(enrolments)
 
     new AuthorisationService(mockConnector)
   }
 
-  val authorityModel = AuthorityModel("Agent", Set(Enrolment("Key", Seq(Identifier("key", "value")), "Status")))
+  val authAuthorityModel = AuthAuthorityModel("ARN", "EnrolmentUrl")
+  val enrolments = Set(Enrolment("Key", Seq(Identifier("key", "value")), "Status"))
+  val authModel = AuthorityModel("ARN", Set(Enrolment("Key", Seq(Identifier("key", "value")), "Status")))
 
   "Calling the .getUserAuthority" should {
 
     "return a valid Authority model" in {
-      lazy val mockedService = setupService(authorityModel)
+      lazy val mockedService = setupService(authAuthorityModel, enrolments)
 
-      await(mockedService.getUserAuthority()) shouldBe authorityModel
+      await(mockedService.getUserAuthority()) shouldBe authModel
     }
 
-    "return an error when the connector throws one" in {
-      lazy val mockedService = setupService(throw new Exception("Error message"))
+    "return an error when the authority connector throws one" in {
+      lazy val mockedService = setupService(throw new Exception("Error message"), enrolments)
+      lazy val ex = intercept[Exception] {
+        await(mockedService.getUserAuthority())
+      }
+
+      ex.getMessage shouldBe "Error message"
+    }
+
+    "return an error when the enrolments connector throws one" in {
+      lazy val mockedService = setupService(authAuthorityModel, throw new Exception("Error message"))
       lazy val ex = intercept[Exception] {
         await(mockedService.getUserAuthority())
       }

@@ -23,11 +23,15 @@ import models.AuthorityModel
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class AuthorisationService @Inject()(connector: AuthorisationConnector) {
 
   def getUserAuthority()(implicit hc: HeaderCarrier): Future[AuthorityModel] = {
-    connector.getAuthority()
+    for {
+      authority <- connector.getAuthority()
+      enrolments <- connector.getEnrolmentsResponse(authority.enrolmentsUrl)
+    } yield AuthorityModel(authority.affinityGroup, enrolments)
   }
 }

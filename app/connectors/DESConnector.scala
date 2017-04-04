@@ -55,11 +55,11 @@ class DESConnector @Inject()(appConfig: ApplicationConfig, logger: Logging) exte
 
   def createAgentClientRelationship(relationshipModel: RelationshipModel)(implicit hc: HeaderCarrier): Future[DesResponse] ={
     val arnReference = relationshipModel.arn
-    Logger.warn(s"Made a POST request to the stub to create a relationship model with the ARN ${arnReference}" +
-      s"and CGT Ref ${relationshipModel.cgtRef}")
+    Logger.warn(s"Made a POST request to the stub to create a relationship model with the ARN $arnReference" +
+      s" and CGT Ref ${relationshipModel.cgtRef}")
     val requestUrl: String = s"$serviceUrl$serviceContext/create-relationship/"
     val response = cPOST(requestUrl, Json.toJson(relationshipModel))
-    val auditMap: Map[String, String] = Map("ARN"->arnReference, "Url"->requestUrl)
+    val auditMap: Map[String, String] = Map("ARN" -> arnReference, "Url" -> requestUrl)
     response map {
       r =>
         r.status match {

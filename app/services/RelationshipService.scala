@@ -45,5 +45,4 @@ class RelationshipService @Inject()(ggConnector: GovernmentGatewayConnector, des
       case (_, _) => FailedAgentCreation
     }
   }
-
 }

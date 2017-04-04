@@ -28,6 +28,8 @@ trait AppConfig {
   val authBaseUrl: String
   val authAuthorityUrl: String
   val governmentGatewayServiceUrl: String
+  val desEnvironment: String
+  val desToken: String
 }
 
 @Singleton
@@ -43,4 +45,6 @@ class ApplicationConfig @Inject()(configuration: Configuration) extends AppConfi
   override lazy val authBaseUrl: String = baseUrl("auth")
   override lazy val authAuthorityUrl: String = s"$authBaseUrl/auth/authority"
   override lazy val governmentGatewayServiceUrl: String = baseUrl("government-gateway")
+  override val desEnvironment: String = loadConfig("microservice.services.des.environment")
+  override val desToken: String = loadConfig("microservice.services.des.token")
 }

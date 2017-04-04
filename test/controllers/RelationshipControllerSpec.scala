@@ -131,7 +131,7 @@ class RelationshipControllerSpec extends UnitSpec with MockitoSugar with OneAppP
       val submissionModel = "Not a submission model"
       val request = FakeRequest().withJsonBody(Json.toJson(submissionModel))
 
-      "return a status of 404" in {
+      "return a status of 400" in {
         lazy val authService = createMockAuthService(
           Some(AuthorityModel("Agent", Set(Enrolment(keys.agentEnrolmentKey, Seq(Identifier("DummyKey", "DummyValue")), ""))))
         )

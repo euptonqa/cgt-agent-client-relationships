@@ -37,10 +37,16 @@ class AuthorisationConnectorSpec extends UnitSpec with MockitoSugar with OneAppP
   lazy val injector: Injector = app.injector
   lazy val mockConfig: AppConfig = injector.instanceOf[AppConfig]
 
-  lazy val mockHttp: HttpGet = mock[HttpGet]
 
-  lazy val target = new AuthorisationConnector(mockConfig) {
-    override val http: HttpGet = mockHttp
+  def createTarget(mockResponse: HttpResponse): AuthorisationConnector = {
+    lazy val mockHttp: HttpGet = mock[HttpGet]
+
+    when(mockHttp.GET[HttpResponse](ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+      .thenReturn(Future.successful(mockResponse))
+
+    new AuthorisationConnector(mockConfig) {
+      override val http: HttpGet = mockHttp
+    }
   }
 
   lazy val authorityResponse: JsValue = Json.parse(
@@ -58,9 +64,7 @@ class AuthorisationConnectorSpec extends UnitSpec with MockitoSugar with OneAppP
 
     "called with a valid request" should {
 
-      when(mockHttp.GET[HttpResponse](ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-        .thenReturn(Future.successful(HttpResponse(OK, Some(authorityResponse))))
-
+      lazy val target = createTarget(HttpResponse(OK, Some(authorityResponse)))
       lazy val result = await(target.getAuthority())
 
       "return an AuthorityModel" in {
@@ -77,9 +81,7 @@ class AuthorisationConnectorSpec extends UnitSpec with MockitoSugar with OneAppP
     }
 
     "the Connection responds with a not an OK status" in {
-      when(mockHttp.GET[HttpResponse](ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-        .thenReturn(Future.successful(HttpResponse(BAD_REQUEST, Some(authorityResponse))))
-
+      lazy val target = createTarget(HttpResponse(BAD_REQUEST, Some(authorityResponse)))
       lazy val result = await(target.getAuthority())
 
       lazy val exception = intercept[Exception] {
@@ -87,6 +89,41 @@ class AuthorisationConnectorSpec extends UnitSpec with MockitoSugar with OneAppP
       }
 
       exception.getMessage shouldBe s"The request for the authority returned a $BAD_REQUEST"
+    }
+  }
+
+  lazy val enrolmentJson: JsValue = Json.parse(
+    s"""[{"key":"EnrolmentKey","identifiers":[{"key":"IDKey","value":"IdentifierValue"}],"state":"State"}]""".stripMargin
+  )
+
+  "Calling AuthorisationConnector.getEnrolmentsResponse" when {
+
+    "the connection returns an OK" should {
+
+      lazy val target = createTarget(HttpResponse(OK, Some(enrolmentJson)))
+      lazy val result = await(target.getEnrolmentsResponse("test-url"))
+
+      "return a set of enrolments" in {
+        result shouldBe a[Set[Enrolment]]
+      }
+
+      "have the key EnrolmentKey" in {
+        result.contains(Enrolment("EnrolmentKey", Seq(Identifier("IDKey", "IdentifierValue")), "State"))
+      }
+    }
+
+    "the connection returns a 400" should {
+
+      "respond with an error" in {
+
+        lazy val target = createTarget(HttpResponse(BAD_REQUEST))
+        lazy val result = await(target.getEnrolmentsResponse("enrolment-url"))
+
+        lazy val exception = intercept[Exception] {
+          await(result)
+        }
+        exception.getMessage shouldBe s"Failed to retrieve enrolments"
+      }
     }
   }
 }

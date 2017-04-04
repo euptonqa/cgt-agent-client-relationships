@@ -56,7 +56,9 @@ class AuthorisationConnector @Inject()(config: AppConfig) {
     http.GET[HttpResponse](getUrl).map {
       response =>
         response.status match {
-          case OK => response.json.as[Set[Enrolment]]
+          case OK =>
+            println(response.json)
+            response.json.as[Set[Enrolment]]
           case _ => throw new Exception("Failed to retrieve enrolments")
         }
     }

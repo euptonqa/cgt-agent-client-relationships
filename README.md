@@ -33,6 +33,7 @@ This service is written in [Scala](http://www.scala-lang.org/) and [Play](http:/
 * Audit - Datastream
 * Auth
 * Government Gateway - GG
+* Capital Gains Subscription
 
 ### License
 

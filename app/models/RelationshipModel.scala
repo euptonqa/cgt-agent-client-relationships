@@ -16,6 +16,7 @@
 
 package models
 
+import org.apache.commons.lang3.RandomStringUtils
 import play.api.libs.json.{JsValue, Json, OFormat}
 
 case class RelationshipModel(agentReferenceNumber: String, refNumber: String)
@@ -23,9 +24,17 @@ case class RelationshipModel(agentReferenceNumber: String, refNumber: String)
 object RelationshipModel {
   implicit val formats: OFormat[RelationshipModel] = Json.format[RelationshipModel]
 
+  def getUniqueAckNo: String = {
+    val length = 32
+    val nanoTime = System.nanoTime()
+    val restChars = length - nanoTime.toString.length
+    val randomChars = RandomStringUtils.randomAlphanumeric(restChars)
+    randomChars + nanoTime
+  }
+
   val asJson: RelationshipModel => JsValue = model => {
     Json.obj(
-      "acknowledgementReference" -> "dummy",
+      "acknowledgementReference" -> getUniqueAckNo,
       "refNumber" -> model.refNumber,
       "agentReferenceNumber" -> model.agentReferenceNumber,
       "regime" -> "CGT",
@@ -34,4 +43,5 @@ object RelationshipModel {
         "isExclusiveAgent" -> true
       )
     )
+  }
 }

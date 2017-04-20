@@ -41,11 +41,11 @@ class GovernmentGatewayConnector @Inject()(config: ApplicationConfig) {
         "identifiers" -> Json.arr(
           Json.obj(
             "identifierType" -> "cgtReference",
-            "value" -> submissionModel.relationshipModel.cgtRef
+            "value" -> submissionModel.relationshipModel.refNumber
           ),
           Json.obj(
             "identifierType" -> "cgtReference1",
-            "value" -> submissionModel.relationshipModel.cgtRef
+            "value" -> submissionModel.relationshipModel.refNumber
           )
         )
       )
@@ -53,7 +53,7 @@ class GovernmentGatewayConnector @Inject()(config: ApplicationConfig) {
   }
 
   def createClientRelationship(submissionModel: SubmissionModel)(implicit hc: HeaderCarrier): Future[Int] = {
-    val url: String = s"$serviceUrl/agent/${submissionModel.relationshipModel.arn}/client-list"
+    val url: String = s"$serviceUrl/agent/${submissionModel.relationshipModel.agentReferenceNumber}/client-list"
 
     http.POST[JsValue, HttpResponse](url, modelToSubmissionPayload(submissionModel)).map {
       response => response.status match {

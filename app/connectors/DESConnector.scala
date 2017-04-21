@@ -58,7 +58,7 @@ class DESConnector @Inject()(appConfig: ApplicationConfig, logger: Logging) exte
     Logger.warn(s"Made a POST request to the stub to create a relationship model with the ARN $arnReference" +
       s" and CGT Ref ${relationshipModel.cgtRef}")
     val requestUrl: String = s"$serviceUrl$serviceContext/create-relationship/"
-    val response = cPOST[JsValue, HttpResponse](requestUrl, relationshipModel)
+    val response = cPOST[JsValue, HttpResponse](requestUrl, relationshipModel.toEtmpRelationship)
     val auditMap: Map[String, String] = Map("ARN" -> arnReference, "Url" -> requestUrl)
     response map {
       r =>

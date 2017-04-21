@@ -16,9 +16,32 @@
 
 package models
 
-import play.api.libs.json.{Json, OFormat}
+import org.apache.commons.lang3.RandomStringUtils
+import play.api.libs.json.{JsValue, Json, OFormat}
 
-case class RelationshipModel(arn: String, cgtRef: String)
+case class RelationshipModel(arn: String, cgtRef: String) {
+  def toEtmpRelationship: JsValue = {
+
+    def getUniqueAckNo: String = {
+      val length = 32
+      val nanoTime = System.nanoTime()
+      val restChars = length - nanoTime.toString.length
+      val randomChars = RandomStringUtils.randomAlphanumeric(restChars)
+      randomChars + nanoTime
+    }
+
+    Json.obj(
+      "acknowledgmentReference" -> getUniqueAckNo,
+      "refNumber" -> cgtRef,
+      "agentReferenceNumber" -> arn,
+      "regime" -> "CGT",
+      "authorisation" -> Json.obj(
+        "action" -> "Authorise",
+        "isExclusiveAgent" -> false
+      )
+    )
+  }
+}
 
 object RelationshipModel {
   implicit val formats: OFormat[RelationshipModel] = Json.format[RelationshipModel]

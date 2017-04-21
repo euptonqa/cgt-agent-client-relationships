@@ -22,7 +22,7 @@ import audit.Logging
 import config.{ApplicationConfig, WSHttp}
 import models.RelationshipModel
 import play.api.Logger
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{JsValue, Json, Writes}
 import uk.gov.hmrc.play.http._
 import uk.gov.hmrc.play.http.logging.Authorization
 import play.api.http.Status._
@@ -48,8 +48,8 @@ class DESConnector @Inject()(appConfig: ApplicationConfig, logger: Logging) exte
 
   lazy val serviceUrl: String = appConfig.baseUrl("des")
   lazy val serviceContext: String = appConfig.desContextUrl
-  lazy val environment = appConfig.desEnvironment
-  lazy val token = appConfig.desToken
+  lazy val environment: String = appConfig.desEnvironment
+  lazy val token: String = appConfig.desToken
 
   val http: HttpGet with HttpPost with HttpPut = WSHttp
 
@@ -58,7 +58,7 @@ class DESConnector @Inject()(appConfig: ApplicationConfig, logger: Logging) exte
     Logger.warn(s"Made a POST request to the stub to create a relationship model with the ARN $arnReference" +
       s" and CGT Ref ${relationshipModel.cgtRef}")
     val requestUrl: String = s"$serviceUrl$serviceContext/create-relationship/"
-    val response = cPOST(requestUrl, Json.toJson(relationshipModel))
+    val response = cPOST[JsValue, HttpResponse](requestUrl, relationshipModel.toEtmpRelationship)
     val auditMap: Map[String, String] = Map("ARN" -> arnReference, "Url" -> requestUrl)
     response map {
       r =>
